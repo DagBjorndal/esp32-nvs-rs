@@ -691,12 +691,8 @@ impl<const NUMBER_OF_ENTRIES: usize> NvsPartition<NUMBER_OF_ENTRIES> {
         tweak[..ADDRESS_SIZE].copy_from_slice(&offset.to_le_bytes());
 
         use aes::cipher::KeyInit;
-        let cipher_1 = aes::Aes256::new(aes::cipher::generic_array::GenericArray::from_slice(
-            &key[..32],
-        ));
-        let cipher_2 = aes::Aes256::new(aes::cipher::generic_array::GenericArray::from_slice(
-            &key[32..],
-        ));
+        let cipher_1 = aes::Aes256::new_from_slice(&key[..32]).expect("Unexpected key length");
+        let cipher_2 = aes::Aes256::new_from_slice(&key[32..]).expect("Unexpected key length");
         let xts = xts_mode::Xts128::<aes::Aes256>::new(cipher_1, cipher_2);
 
         let mut buffer = [0u8; 32];
