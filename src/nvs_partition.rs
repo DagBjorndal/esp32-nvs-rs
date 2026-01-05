@@ -633,7 +633,7 @@ impl<const NUMBER_OF_ENTRIES: usize> NvsPartition<NUMBER_OF_ENTRIES> {
             let mut chunk_data = &value[bytes_written..bytes_written + chunk_size];
             let span = chunk_size.div_ceil(Entry::SIZE) + 1;
             assert!(span >= 1);
-            assert!(span < NUMBER_OF_ENTRIES);
+            assert!(span <= NUMBER_OF_ENTRIES);
             let entry =
                 Entry::new_blob_data(namespace_index, key, span as u8, num_chunks, chunk_data);
             self.add_entry_or_data(EntryOrData::Entry(entry));
@@ -649,11 +649,6 @@ impl<const NUMBER_OF_ENTRIES: usize> NvsPartition<NUMBER_OF_ENTRIES> {
             bytes_written += chunk_size;
             num_chunks += 1;
         }
-
-        // Write blob index
-        let index_entry =
-            Entry::new_blob_index(namespace_index, key, 0, num_chunks, value_len as u32);
-        self.add_entry_or_data(EntryOrData::Entry(index_entry));
 
         Ok(())
     }
